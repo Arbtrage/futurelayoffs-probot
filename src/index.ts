@@ -14,7 +14,7 @@ export = (app: Probot) => {
   app.on("issue_comment.created", async (context) => {
     try {
       const process = await processIssue(context.payload);
-      if(process.status!==201) {
+      if(process.status!==200) {
         throw process.message
       }
       const issueComment = context.issue({
