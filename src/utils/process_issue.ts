@@ -12,12 +12,23 @@ async function processIssue(data: any) {
         return tag.name
     })
 
+    const regex = /\$([0-9]+)/;
+    const match = data.comment.body.match(regex);
+    let bountyAmount = 0;
+    if (match && match[1]) {
+        bountyAmount = parseInt(match[1]);
+        console.log("Bounty Amount:", bountyAmount);
+    } else {
+        console.log("No bounty amount found.");
+    }
+
     const payload = {
         name: data.issue.title,
         description: data.issue.body,
         tags: tags || [],
         status: data.issue.state,
         repository_url: data.repository.html_url,
+        bounty: bountyAmount,
         repository_name: data.repository.full_name,
         repository_description: data.repository.description,
         license: data.repository.license,
@@ -32,7 +43,7 @@ async function processIssue(data: any) {
         console.log("Error:", error);
         return { status: 400, message: error };
     }
-    
+
 }
 
 export {
