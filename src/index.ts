@@ -1,4 +1,6 @@
 import { Probot } from "probot";
+import { processIssue } from "./utils/process_issue";
+
 
 export = (app: Probot) => {
   
@@ -10,6 +12,19 @@ export = (app: Probot) => {
   });
 
   app.on("issue_comment.created", async (context) => {
-    console.log(context);
-  })
+    try {
+      const process = await processIssue(context.payload);
+      if(process.status!==201) {
+        throw process.message
+      }
+      const issueComment = context.issue({
+        body: "Bounty has been created !!",
+      })
+      await context.octokit.issues.createComment(issueComment);
+    } catch (error) {
+      console.log("Bot will not run !!!");
+      console.log("Error:", error);
+    }
+    return true;
+  });
 };
